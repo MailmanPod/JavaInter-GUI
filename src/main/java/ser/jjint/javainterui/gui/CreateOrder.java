@@ -30,11 +30,9 @@ public class CreateOrder extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        getContentPane().setLayout(new java.awt.GridLayout());
+        getContentPane().setLayout(new java.awt.GridLayout(1, 0));
 
         jPanel1.setLayout(new java.awt.GridLayout(4, 0));
 
@@ -67,32 +65,6 @@ public class CreateOrder extends javax.swing.JFrame {
         );
 
         jPanel1.add(jPanel3);
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 465, Short.MAX_VALUE)
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 113, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel7);
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 465, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 113, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel4);
 
         getContentPane().add(jPanel1);
 
@@ -138,7 +110,5 @@ public class CreateOrder extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel7;
     // End of variables declaration//GEN-END:variables
 }
