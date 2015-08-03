@@ -386,7 +386,7 @@
                           <Component id="btnAbmItem" alignment="0" max="32767" attributes="0"/>
                           <Component id="btnCambioEstadoOrden" alignment="0" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="24" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -414,7 +414,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnAbmItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="ABM Item"/>
+                <Property name="text" type="java.lang.String" value="A&#xf1;adir Item"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAbmItemActionPerformed"/>
@@ -424,6 +424,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Cambiar Estado Orden"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCambioEstadoOrdenActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

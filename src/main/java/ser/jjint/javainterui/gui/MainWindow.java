@@ -254,7 +254,7 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        btnAbmItem.setText("ABM Item");
+        btnAbmItem.setText("Añadir Item");
         btnAbmItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAbmItemActionPerformed(evt);
@@ -262,6 +262,11 @@ public class MainWindow extends javax.swing.JFrame {
         });
 
         btnCambioEstadoOrden.setText("Cambiar Estado Orden");
+        btnCambioEstadoOrden.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCambioEstadoOrdenActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlHigherFunctionsLayout = new javax.swing.GroupLayout(pnlHigherFunctions);
         pnlHigherFunctions.setLayout(pnlHigherFunctionsLayout);
@@ -273,7 +278,7 @@ public class MainWindow extends javax.swing.JFrame {
                     .addComponent(btnNuevaOrden, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnAbmItem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnCambioEstadoOrden, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         pnlHigherFunctionsLayout.setVerticalGroup(
             pnlHigherFunctionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -352,6 +357,10 @@ public class MainWindow extends javax.swing.JFrame {
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
         initOrderTable();
     }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnCambioEstadoOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCambioEstadoOrdenActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCambioEstadoOrdenActionPerformed
 
     /**
      * @param args the command line arguments
