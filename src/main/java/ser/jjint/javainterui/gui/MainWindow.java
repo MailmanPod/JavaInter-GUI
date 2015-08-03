@@ -5,6 +5,15 @@
  */
 package ser.jjint.javainterui.gui;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import ser.jint.facade.OrderFacadeSubject;
+import ser.jint.javainterui.datamodels.OrderDataModel;
+import ser.jint.wizardmodels.CreateOrder;
+
 /**
  *
  * @author Razorback
@@ -16,6 +25,19 @@ public class MainWindow extends javax.swing.JFrame {
      */
     public MainWindow() {
         initComponents();
+        centrarPantalla();
+        initOrderTable();
+    }
+
+    private void centrarPantalla() {
+        Dimension tamFrame = this.getSize();//para obtener las dimensiones del frame
+        Dimension tamPantalla = Toolkit.getDefaultToolkit().getScreenSize();//para obtener el tamaño de la pantalla
+        setLocation((tamPantalla.width - tamFrame.width) / 2, (tamPantalla.height - tamFrame.height) / 2);//para posicionar
+    }
+    
+    private void initOrderTable(){
+        OrderDataModel dataModel = new OrderDataModel(OrderFacadeSubject.getInstance().getOrderList());
+        this.tblOrders.setModel(dataModel);
     }
 
     /**
@@ -32,6 +54,7 @@ public class MainWindow extends javax.swing.JFrame {
         pnlTasks = new javax.swing.JPanel();
         btnCargarDatos = new javax.swing.JButton();
         btnGuardarDatos = new javax.swing.JButton();
+        btnRefresh = new javax.swing.JButton();
         pnlFooter = new javax.swing.JPanel();
         pnlFunctions = new javax.swing.JPanel();
         pnlOrderFind = new javax.swing.JPanel();
@@ -50,8 +73,8 @@ public class MainWindow extends javax.swing.JFrame {
         btnNuevaOrden = new javax.swing.JButton();
         btnAbmItem = new javax.swing.JButton();
         btnCambioEstadoOrden = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tabOrdenes = new javax.swing.JTable();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblOrders = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -64,6 +87,13 @@ public class MainWindow extends javax.swing.JFrame {
 
         btnGuardarDatos.setText("Guardar Datos");
 
+        btnRefresh.setText("Refrescar");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlTasksLayout = new javax.swing.GroupLayout(pnlTasks);
         pnlTasks.setLayout(pnlTasksLayout);
         pnlTasksLayout.setHorizontalGroup(
@@ -73,7 +103,9 @@ public class MainWindow extends javax.swing.JFrame {
                 .addComponent(btnCargarDatos)
                 .addGap(18, 18, 18)
                 .addComponent(btnGuardarDatos)
-                .addContainerGap(729, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(660, Short.MAX_VALUE))
         );
         pnlTasksLayout.setVerticalGroup(
             pnlTasksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -81,7 +113,8 @@ public class MainWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(pnlTasksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCargarDatos)
-                    .addComponent(btnGuardarDatos))
+                    .addComponent(btnGuardarDatos)
+                    .addComponent(btnRefresh))
                 .addContainerGap(13, Short.MAX_VALUE))
         );
 
@@ -91,7 +124,7 @@ public class MainWindow extends javax.swing.JFrame {
         pnlFooter.setLayout(pnlFooterLayout);
         pnlFooterLayout.setHorizontalGroup(
             pnlFooterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 962, Short.MAX_VALUE)
+            .addGap(0, 1009, Short.MAX_VALUE)
         );
         pnlFooterLayout.setVerticalGroup(
             pnlFooterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -215,8 +248,18 @@ public class MainWindow extends javax.swing.JFrame {
         pnlHigherFunctions.setBorder(javax.swing.BorderFactory.createTitledBorder("Otras Funciones"));
 
         btnNuevaOrden.setText("Crear Nueva Orden");
+        btnNuevaOrden.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevaOrdenActionPerformed(evt);
+            }
+        });
 
         btnAbmItem.setText("ABM Item");
+        btnAbmItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAbmItemActionPerformed(evt);
+            }
+        });
 
         btnCambioEstadoOrden.setText("Cambiar Estado Orden");
 
@@ -269,9 +312,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         getContentPane().add(pnlFunctions, java.awt.BorderLayout.LINE_START);
 
-        jScrollPane2.setViewportBorder(javax.swing.BorderFactory.createTitledBorder("Ordenes Creadas"));
-
-        tabOrdenes.setModel(new javax.swing.table.DefaultTableModel(
+        tblOrders.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
                 {},
@@ -282,9 +323,9 @@ public class MainWindow extends javax.swing.JFrame {
 
             }
         ));
-        jScrollPane2.setViewportView(tabOrdenes);
+        jScrollPane1.setViewportView(tblOrders);
 
-        getContentPane().add(jScrollPane2, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -297,6 +338,21 @@ public class MainWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnNuevaOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevaOrdenActionPerformed
+        // TODO add your handling code here:
+        CreateOrder wizard = new CreateOrder();
+        wizard.main();
+    }//GEN-LAST:event_btnNuevaOrdenActionPerformed
+
+    private void btnAbmItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbmItemActionPerformed
+        ABMItems items = new ABMItems();
+        items.setVisible(true);
+    }//GEN-LAST:event_btnAbmItemActionPerformed
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        initOrderTable();
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -307,20 +363,11 @@ public class MainWindow extends javax.swing.JFrame {
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(),
+                    "Error cargando UI", JOptionPane.ERROR_MESSAGE);
         }
         //</editor-fold>
 
@@ -341,11 +388,12 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.ButtonGroup btnGroupRadOrder;
     private javax.swing.JButton btnGuardarDatos;
     private javax.swing.JButton btnNuevaOrden;
+    private javax.swing.JButton btnRefresh;
     private javax.swing.JComboBox cmbStatusOrder;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCampoBusqueda;
     private javax.swing.JPanel pnlEstadoOrden;
     private javax.swing.JPanel pnlFooter;
@@ -359,7 +407,7 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JRadioButton radCriteriaNroOrden;
     private javax.swing.JRadioButton radFindNroCliente;
     private javax.swing.JRadioButton radFindNroOrden;
-    private javax.swing.JTable tabOrdenes;
+    private javax.swing.JTable tblOrders;
     private javax.swing.JTextField txtCampoBusqueda;
     // End of variables declaration//GEN-END:variables
 }
