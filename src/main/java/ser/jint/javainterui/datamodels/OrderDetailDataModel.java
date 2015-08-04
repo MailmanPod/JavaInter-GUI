@@ -5,23 +5,22 @@
  */
 package ser.jint.javainterui.datamodels;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
-import ser.jint.bo.Order;
+import ser.jint.bo.OrderDetail;
 
 /**
  *
- * @author Razorback
+ * @author Razor15
  */
-public class OrderDataModel extends AbstractTableModel {
+public class OrderDetailDataModel extends AbstractTableModel{
+
+    private List<OrderDetail> detailOrder;
     
-    private List<Order> orders;
+    private static final String[] COLUMNS = {"ItemId", "Descripcion", "Cantidad", "Subtotal"};
     
-    private static final String[] COLUMNS = {"ID", "Cliente", "Estado de la orden", "Cantidad Items", "Fecha Creacion", "Lugar de despacho"};
-    
-    public OrderDataModel(List<Order> orders){
-        this.orders = orders;
+    public OrderDetailDataModel(List<OrderDetail> detail){
+        this.detailOrder = detail;
     }
 
     @Override
@@ -33,11 +32,11 @@ public class OrderDataModel extends AbstractTableModel {
     public String getColumnName(int column) {
         return COLUMNS[column];
     }
-
+    
     
     @Override
     public int getRowCount() {
-        return this.orders.size();
+        return detailOrder.size();
     }
 
     @Override
@@ -47,24 +46,19 @@ public class OrderDataModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Order aux = this.orders.get(rowIndex);
+        OrderDetail od = this.detailOrder.get(rowIndex);
         
         switch(columnIndex){
             case 0:
-                return aux.getOrderNumber();
+                return od.getItem().getItemId();
             case 1:
-                return aux.getClientName();
+                return od.getItem().getItemDescription();
             case 2:
-                return aux.getContextState();
+                return od.getQuantity();
             case 3:
-                return aux.getOrderDetails().size();
-            case 4:
-                return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(aux.getCreationDate());
-            case 5:
-                return aux.getDispatchCenter();
+                return od.getDetailTotal();
         }
         
         return null;
     }
-    
 }

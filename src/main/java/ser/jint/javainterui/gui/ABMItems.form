@@ -4,6 +4,9 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
     <Property name="title" type="java.lang.String" value="ABM Items"/>
+    <Property name="modalExclusionType" type="java.awt.Dialog$ModalExclusionType" editor="org.netbeans.modules.form.editors.EnumEditor">
+      <Value id="APPLICATION_EXCLUDE"/>
+    </Property>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
@@ -241,6 +244,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="txtMusicLabel" min="-2" pref="134" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="btnGuardarModif" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="89" max="-2" attributes="0"/>
                   </Group>
@@ -259,6 +263,7 @@
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="cmbItemTypes" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="btnAddItem" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnGuardarModif" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -397,6 +402,14 @@
                 </Property>
               </Properties>
             </Component>
+            <Component class="javax.swing.JButton" name="btnGuardarModif">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Guardar Modificacion"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGuardarModifActionPerformed"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>
@@ -442,6 +455,9 @@
                   <Table columnCount="0" rowCount="4"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tblAllItemsMouseClicked"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

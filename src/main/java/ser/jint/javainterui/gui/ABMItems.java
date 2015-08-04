@@ -3,17 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ser.jjint.javainterui.gui;
+package ser.jint.javainterui.gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import ser.jint.bo.Books;
 import ser.jint.bo.Electronic;
+import ser.jint.bo.Items;
 import ser.jint.bo.Music;
 import ser.jint.builder.ItemAutoSequence;
 import ser.jint.facade.OrderFacadeSubject;
@@ -42,7 +47,11 @@ public class ABMItems extends javax.swing.JFrame {
         setLocation((tamPantalla.width - tamFrame.width) / 2, (tamPantalla.height - tamFrame.height) / 2);//para posicionar
     }
 
+    private int idItem;
+    
     private void initFields() {
+        idItem = 0;
+        
         String combo = (String) this.cmbItemTypes.getSelectedItem();
 
         if (combo.equalsIgnoreCase("Libro")) {
@@ -72,19 +81,23 @@ public class ABMItems extends javax.swing.JFrame {
         this.txtBookEditor.setEnabled(state);
         this.txtBookPages.setEnabled(state);
     }
-    
-    private void clearFields(){
+
+    private void clearFields() {
         this.txtBookDate.setText(null);
         this.txtBookEditor.setText(null);
         this.txtBookPages.setText(null);
+
         this.txtElectronicMark.setText(null);
+
         this.txtItemDescription.setText(null);
         this.txtItemPrice.setText(null);
         this.txtItemStock.setText(null);
         this.txtItemTax.setText(null);
+
         this.txtMusicArtist.setText(null);
         this.txtMusicLabel.setText(null);
         this.txtMusicSongs.setText(null);
+
         this.cmbItemTypes.setSelectedIndex(0);
         this.cmbElectronicTypes.setSelectedIndex(0);
     }
@@ -127,6 +140,7 @@ public class ABMItems extends javax.swing.JFrame {
         txtMusicArtist = new javax.swing.JTextField();
         btnAddItem = new javax.swing.JButton();
         cmbElectronicTypes = new javax.swing.JComboBox();
+        btnGuardarModif = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblAllItems = new javax.swing.JTable();
@@ -134,6 +148,7 @@ public class ABMItems extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("ABM Items");
+        setModalExclusionType(java.awt.Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         setResizable(false);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos Generales"));
@@ -229,6 +244,13 @@ public class ABMItems extends javax.swing.JFrame {
 
         cmbElectronicTypes.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Celular", "TV", "Consola VideoJuego", "Lavarropa" }));
 
+        btnGuardarModif.setText("Guardar Modificacion");
+        btnGuardarModif.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarModifActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -275,7 +297,8 @@ public class ABMItems extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(lblMusicLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtMusicLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtMusicLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnGuardarModif))
                 .addGap(89, 89, 89))
         );
         jPanel4Layout.setVerticalGroup(
@@ -289,7 +312,8 @@ public class ABMItems extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(cmbItemTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnAddItem))
+                            .addComponent(btnAddItem)
+                            .addComponent(btnGuardarModif))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtBookPages, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -352,6 +376,11 @@ public class ABMItems extends javax.swing.JFrame {
 
             }
         ));
+        tblAllItems.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblAllItemsMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblAllItems);
 
         cmbShowItems.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Todos", "Libro", "Electronica", "Musica" }));
@@ -504,7 +533,7 @@ public class ABMItems extends javax.swing.JFrame {
     private void cmbShowItemsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbShowItemsItemStateChanged
         String combo = (String) this.cmbShowItems.getSelectedItem();
         ItemDataModel dataModel = null;
-        
+
         switch (combo) {
             case "Todos":
                 initTable();
@@ -523,6 +552,182 @@ public class ABMItems extends javax.swing.JFrame {
                 break;
         }
     }//GEN-LAST:event_cmbShowItemsItemStateChanged
+
+    private void setMusic(Music m) {
+        this.idItem = 0;
+        
+        enableBooks(false);
+        enableElectronic(false);
+        enableMusic(true);
+
+        this.idItem = m.getItemId();
+        
+        this.cmbItemTypes.setSelectedIndex(2);
+
+        this.txtItemDescription.setText(m.getItemDescription());
+        this.txtItemPrice.setText(new Double(m.getPrice()).toString());
+        this.txtItemStock.setText(new Integer(m.getStock()).toString());
+        this.txtItemTax.setText(new Double(m.getTax()).toString());
+
+        this.txtMusicArtist.setText(m.getArtist());
+        this.txtMusicLabel.setText(m.getLabel());
+        this.txtMusicSongs.setText(new Integer(m.getSongs()).toString());
+    }
+    
+    private void setElectronic(Electronic e){
+        this.idItem = 0;
+        
+        enableBooks(false);
+        enableElectronic(false);
+        enableMusic(true);
+
+        this.idItem = e.getItemId();
+        
+        this.cmbItemTypes.setSelectedIndex(1);
+
+        this.txtItemDescription.setText(e.getItemDescription());
+        this.txtItemPrice.setText(new Double(e.getPrice()).toString());
+        this.txtItemStock.setText(new Integer(e.getStock()).toString());
+        this.txtItemTax.setText(new Double(e.getTax()).toString());
+        
+        this.txtElectronicMark.setText(e.getMark());
+        this.cmbElectronicTypes.setSelectedItem(e.getType());
+    }
+    
+    private void setBooks(Books b){
+        this.idItem = 0;
+        
+        enableBooks(false);
+        enableElectronic(false);
+        enableMusic(true);
+
+        this.idItem = b.getItemId();
+        
+        this.cmbItemTypes.setSelectedIndex(0);
+
+        this.txtItemDescription.setText(b.getItemDescription());
+        this.txtItemPrice.setText(new Double(b.getPrice()).toString());
+        this.txtItemStock.setText(new Integer(b.getStock()).toString());
+        this.txtItemTax.setText(new Double(b.getTax()).toString());
+        
+        this.txtBookDate.setText(new SimpleDateFormat("dd/MM/yyyy").format(b.getPublishDate()));
+        this.txtBookEditor.setText(b.getEditor());
+        this.txtBookPages.setText(new Integer(b.getPages()).toString());
+    }
+
+    private void tblAllItemsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblAllItemsMouseClicked
+        JTable input = (JTable) evt.getSource();
+
+        Object inputKey = input.getValueAt(input.getSelectedRow(),
+                0);
+
+        if (inputKey != null) {
+            Integer integer = (Integer) inputKey;
+
+            List<Items> idTypeSearch = OrderFacadeSubject.getInstance().idTypeSearch(integer);
+
+            if (idTypeSearch.size() == 1) {
+                Items result = idTypeSearch.get(0);
+                
+                switch (result.getItemType()) {
+                    case "Music":
+                        Music m = (Music) result;
+                        setMusic(m);
+                        break;
+                    case "Electronic":
+                        Electronic e = (Electronic) result;
+                        setElectronic(e);
+                        break;
+                    case "Books":
+                        Books b = (Books) result;
+                        setBooks(b);
+                        break;
+                }
+            }
+        }
+
+    }//GEN-LAST:event_tblAllItemsMouseClicked
+
+    private void updateMusic(){
+        Music m = ItemFactory.getItemFactory(ItemFactory.MUSIC).getMusic();
+
+        m.setItemDescription(this.txtItemDescription.getText());
+        m.setPrice(new Double(this.txtItemPrice.getText()));
+        m.setTax(new Double(this.txtItemTax.getText()));
+        m.setStock(new Integer(this.txtItemStock.getText()));
+
+        m.setArtist(txtMusicArtist.getText());
+        m.setLabel(this.txtMusicLabel.getText());
+        m.setSongs(new Integer(this.txtMusicSongs.getText()));
+        
+        m.setItemId(idItem);
+        
+        OrderFacadeSubject.getInstance().updateItem(m);
+    }
+    
+    private void updateElectronic(){
+        Electronic e = ItemFactory.getItemFactory(ItemFactory.ELECTRONIC).getElectronic();
+
+        e.setItemDescription(this.txtItemDescription.getText());
+        e.setPrice(new Double(this.txtItemPrice.getText()));
+        e.setTax(new Double(this.txtItemTax.getText()));
+        e.setStock(new Integer(this.txtItemStock.getText()));
+
+        e.setMark(this.txtElectronicMark.getText());
+        e.setType((String) this.cmbElectronicTypes.getSelectedItem());
+
+        e.setItemId(ItemAutoSequence.getInstance().getNextSequence());
+        
+        e.setItemId(idItem);
+        
+        OrderFacadeSubject.getInstance().updateItem(e);
+    }
+    
+    private void updateBooks() throws ParseException{
+        Books b = ItemFactory.getItemFactory(ItemFactory.BOOKS).getBooks();
+
+        b.setItemDescription(this.txtItemDescription.getText());
+        b.setPrice(new Double(this.txtItemPrice.getText()));
+        b.setTax(new Double(this.txtItemTax.getText()));
+        b.setStock((int) (Math.random() * 100));
+
+        b.setPublishDate(new SimpleDateFormat("dd/MM/yyyy").parse(this.txtBookDate.getText()));
+        b.setEditor(this.txtBookEditor.getText());
+        b.setPages(new Integer(this.txtBookPages.getText()));
+
+        b.setItemId(idItem);
+
+        OrderFacadeSubject.getInstance().updateItem(b);
+    }
+    
+    private void btnGuardarModifActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarModifActionPerformed
+
+                String combo = (String) this.cmbItemTypes.getSelectedItem();
+
+        switch (combo) {
+            case "Libro":
+                {
+                    try {
+                        updateBooks();
+                    } catch (ParseException ex) {
+                        Logger.getLogger(ABMItems.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                clearFields();
+                initTable();
+            break;
+            case "Electronica":
+                updateElectronic();
+                clearFields();
+                initTable();
+                break;
+            case "Musica":
+                updateMusic();
+                clearFields();
+                initTable();
+                break;
+        }
+    }//GEN-LAST:event_btnGuardarModifActionPerformed
 
     /**
      * @param args the command line arguments
@@ -552,6 +757,7 @@ public class ABMItems extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddItem;
+    private javax.swing.JButton btnGuardarModif;
     private javax.swing.JComboBox cmbElectronicTypes;
     private javax.swing.JComboBox cmbItemTypes;
     private javax.swing.JComboBox cmbShowItems;

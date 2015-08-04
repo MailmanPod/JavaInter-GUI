@@ -3,15 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ser.jjint.javainterui.gui;
+package ser.jint.javainterui.gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import ser.jint.bo.Order;
 import ser.jint.facade.OrderFacadeSubject;
 import ser.jint.javainterui.datamodels.OrderDataModel;
+import ser.jint.strategy.ListingStrategy;
+import ser.jint.strategy.OrderDateListing;
+import ser.jint.strategy.OrderIdListing;
+import ser.jint.strategy.OrderStateListing;
 import ser.jint.wizardmodels.CreateOrder;
 
 /**
@@ -34,9 +45,12 @@ public class MainWindow extends javax.swing.JFrame {
         Dimension tamPantalla = Toolkit.getDefaultToolkit().getScreenSize();//para obtener el tamaño de la pantalla
         setLocation((tamPantalla.width - tamFrame.width) / 2, (tamPantalla.height - tamFrame.height) / 2);//para posicionar
     }
-    
-    private void initOrderTable(){
+
+    private void initOrderTable() {
         OrderDataModel dataModel = new OrderDataModel(OrderFacadeSubject.getInstance().getOrderList());
+        
+        System.out.println("Size: " + OrderFacadeSubject.getInstance().getOrderList().size());
+        
         this.tblOrders.setModel(dataModel);
     }
 
@@ -63,7 +77,8 @@ public class MainWindow extends javax.swing.JFrame {
         radFindNroCliente = new javax.swing.JRadioButton();
         radFindNroOrden = new javax.swing.JRadioButton();
         pnlEstadoOrden = new javax.swing.JPanel();
-        cmbStatusOrder = new javax.swing.JComboBox();
+        cmbDispatcher = new javax.swing.JComboBox();
+        radFindState = new javax.swing.JRadioButton();
         btnFindOrder = new javax.swing.JButton();
         pnlOrderListCriteria = new javax.swing.JPanel();
         radCriteriaNroOrden = new javax.swing.JRadioButton();
@@ -72,20 +87,28 @@ public class MainWindow extends javax.swing.JFrame {
         pnlHigherFunctions = new javax.swing.JPanel();
         btnNuevaOrden = new javax.swing.JButton();
         btnAbmItem = new javax.swing.JButton();
-        btnCambioEstadoOrden = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblOrders = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Gestion Pedidos");
         setResizable(false);
 
         btnCargarDatos.setText("Cargar Datos");
+        btnCargarDatos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCargarDatosActionPerformed(evt);
+            }
+        });
 
         btnGuardarDatos.setText("Guardar Datos");
+        btnGuardarDatos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarDatosActionPerformed(evt);
+            }
+        });
 
         btnRefresh.setText("Refrescar");
         btnRefresh.addActionListener(new java.awt.event.ActionListener() {
@@ -105,7 +128,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addComponent(btnGuardarDatos)
                 .addGap(18, 18, 18)
                 .addComponent(btnRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(660, Short.MAX_VALUE))
+                .addContainerGap(806, Short.MAX_VALUE))
         );
         pnlTasksLayout.setVerticalGroup(
             pnlTasksLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -124,7 +147,7 @@ public class MainWindow extends javax.swing.JFrame {
         pnlFooter.setLayout(pnlFooterLayout);
         pnlFooterLayout.setHorizontalGroup(
             pnlFooterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1009, Short.MAX_VALUE)
+            .addGap(0, 1155, Short.MAX_VALUE)
         );
         pnlFooterLayout.setVerticalGroup(
             pnlFooterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -146,27 +169,37 @@ public class MainWindow extends javax.swing.JFrame {
         btnGroupRadFind.add(radFindNroOrden);
         radFindNroOrden.setText("Nro Orden");
 
-        pnlEstadoOrden.setBorder(javax.swing.BorderFactory.createTitledBorder("Estado Orden"));
+        pnlEstadoOrden.setBorder(javax.swing.BorderFactory.createTitledBorder("LugarDespachado"));
 
-        cmbStatusOrder.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Centro Distribucion", "Creado", "Despachado", "Entregado", "Cancelado" }));
+        cmbDispatcher.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "UPS", "FedEx", "Correo Argentino", "OCA", "Andreani", "Ocasa", "Western Union" }));
+
+        btnGroupRadFind.add(radFindState);
 
         javax.swing.GroupLayout pnlEstadoOrdenLayout = new javax.swing.GroupLayout(pnlEstadoOrden);
         pnlEstadoOrden.setLayout(pnlEstadoOrdenLayout);
         pnlEstadoOrdenLayout.setHorizontalGroup(
             pnlEstadoOrdenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlEstadoOrdenLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlEstadoOrdenLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(cmbStatusOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(radFindState)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(cmbDispatcher, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnlEstadoOrdenLayout.setVerticalGroup(
             pnlEstadoOrdenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlEstadoOrdenLayout.createSequentialGroup()
-                .addComponent(cmbStatusOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlEstadoOrdenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbDispatcher, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(radFindState))
                 .addGap(0, 3, Short.MAX_VALUE))
         );
 
         btnFindOrder.setText("Buscar");
+        btnFindOrder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFindOrderActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlOrderFindLayout = new javax.swing.GroupLayout(pnlOrderFind);
         pnlOrderFind.setLayout(pnlOrderFindLayout);
@@ -177,16 +210,15 @@ public class MainWindow extends javax.swing.JFrame {
                 .addGroup(pnlOrderFindLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtCampoBusqueda)
                     .addGroup(pnlOrderFindLayout.createSequentialGroup()
-                        .addGroup(pnlOrderFindLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblCampoBusqueda)
-                            .addComponent(pnlEstadoOrden, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 1, Short.MAX_VALUE))
+                        .addComponent(lblCampoBusqueda)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(pnlOrderFindLayout.createSequentialGroup()
                         .addGroup(pnlOrderFindLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(radFindNroCliente)
                             .addComponent(radFindNroOrden))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnFindOrder)))
+                        .addComponent(btnFindOrder))
+                    .addComponent(pnlEstadoOrden, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         pnlOrderFindLayout.setVerticalGroup(
@@ -200,12 +232,11 @@ public class MainWindow extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(radFindNroCliente)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(radFindNroOrden)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlOrderFindLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(radFindNroOrden))
+                    .addGroup(pnlOrderFindLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                         .addComponent(btnFindOrder)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addGap(11, 11, 11)))
                 .addComponent(pnlEstadoOrden, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -214,12 +245,27 @@ public class MainWindow extends javax.swing.JFrame {
         btnGroupRadOrder.add(radCriteriaNroOrden);
         radCriteriaNroOrden.setSelected(true);
         radCriteriaNroOrden.setText("Nro Orden");
+        radCriteriaNroOrden.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                radCriteriaNroOrdenItemStateChanged(evt);
+            }
+        });
 
         btnGroupRadOrder.add(radCriteriaEstadoOrden);
         radCriteriaEstadoOrden.setText("Estado Orden");
+        radCriteriaEstadoOrden.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                radCriteriaEstadoOrdenItemStateChanged(evt);
+            }
+        });
 
         btnGroupRadOrder.add(radCriteriaFechaCreacion);
         radCriteriaFechaCreacion.setText("Fecha Creacion");
+        radCriteriaFechaCreacion.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                radCriteriaFechaCreacionItemStateChanged(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlOrderListCriteriaLayout = new javax.swing.GroupLayout(pnlOrderListCriteria);
         pnlOrderListCriteria.setLayout(pnlOrderListCriteriaLayout);
@@ -261,34 +307,23 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        btnCambioEstadoOrden.setText("Cambiar Estado Orden");
-        btnCambioEstadoOrden.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCambioEstadoOrdenActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout pnlHigherFunctionsLayout = new javax.swing.GroupLayout(pnlHigherFunctions);
         pnlHigherFunctions.setLayout(pnlHigherFunctionsLayout);
         pnlHigherFunctionsLayout.setHorizontalGroup(
             pnlHigherFunctionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlHigherFunctionsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pnlHigherFunctionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnNuevaOrden, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnAbmItem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnCambioEstadoOrden, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addGroup(pnlHigherFunctionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnNuevaOrden, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAbmItem, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlHigherFunctionsLayout.setVerticalGroup(
             pnlHigherFunctionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlHigherFunctionsLayout.createSequentialGroup()
                 .addComponent(btnNuevaOrden)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnCambioEstadoOrden)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnAbmItem)
-                .addGap(17, 17, 17))
+                .addComponent(btnAbmItem))
         );
 
         javax.swing.GroupLayout pnlFunctionsLayout = new javax.swing.GroupLayout(pnlFunctions);
@@ -307,12 +342,12 @@ public class MainWindow extends javax.swing.JFrame {
             pnlFunctionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlFunctionsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlOrderFind, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(pnlOrderFind, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(pnlOrderListCriteria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(pnlHigherFunctions, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(28, 28, 28))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         getContentPane().add(pnlFunctions, java.awt.BorderLayout.LINE_START);
@@ -328,15 +363,17 @@ public class MainWindow extends javax.swing.JFrame {
 
             }
         ));
+        tblOrders.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblOrdersMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblOrders);
 
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jMenu1.setText("File");
+        jMenu1.setText("Opciones");
         jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
@@ -345,22 +382,121 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void btnNuevaOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevaOrdenActionPerformed
         // TODO add your handling code here:
-        CreateOrder wizard = new CreateOrder();
-        wizard.main();
+//        CreateOrder wizard = new CreateOrder();
+//        wizard.main();
+        
+        CreateNewOrder window = new CreateNewOrder();
+        window.setVisible(true);
     }//GEN-LAST:event_btnNuevaOrdenActionPerformed
 
     private void btnAbmItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbmItemActionPerformed
         ABMItems items = new ABMItems();
         items.setVisible(true);
+        
     }//GEN-LAST:event_btnAbmItemActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
         initOrderTable();
     }//GEN-LAST:event_btnRefreshActionPerformed
 
-    private void btnCambioEstadoOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCambioEstadoOrdenActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnCambioEstadoOrdenActionPerformed
+    private void tblOrdersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblOrdersMouseClicked
+        JTable input = (JTable) evt.getSource();
+
+        Object inputKey = input.getValueAt(input.getSelectedRow(),
+                0);
+
+        if (inputKey != null) {
+            Integer integer = (Integer) inputKey;
+
+            List<Order> result = OrderFacadeSubject.getInstance().orderNumberSearch(integer);
+
+            if (result.size() > 0) {
+                OrderDetailWindow window = new OrderDetailWindow();
+                window.order(result.get(0));
+                window.setVisible(true);
+            }
+        }
+    }//GEN-LAST:event_tblOrdersMouseClicked
+
+    private void btnCargarDatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarDatosActionPerformed
+
+        try {
+            OrderFacadeSubject.getInstance().deSerialize(); //OrderFacadeSubject.getInstance().getRawPersistence();
+            initOrderTable();
+        } catch (IllegalAccessException | InvocationTargetException | IOException | InstantiationException | NoSuchMethodException | ClassNotFoundException ex) {
+            try {
+                OrderFacadeSubject.getInstance().deSerialize(); //OrderFacadeSubject.getInstance().getRawPersistence();
+                initOrderTable();
+            } catch (IllegalAccessException | InvocationTargetException | IOException | InstantiationException | NoSuchMethodException | ClassNotFoundException ex1) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Error al leer datos", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnCargarDatosActionPerformed
+
+    private void btnGuardarDatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarDatosActionPerformed
+        try {
+            OrderFacadeSubject.getInstance().serialize();
+            OrderFacadeSubject.getInstance().rawPersistence();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error al grabar datos", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnGuardarDatosActionPerformed
+
+    private void btnFindOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindOrderActionPerformed
+        if (radFindNroOrden.isSelected()) {
+            try {
+                System.out.println("asdsadasd");
+                List<Order> result = OrderFacadeSubject.getInstance().orderNumberSearch(new Integer(this.txtCampoBusqueda.getText()));
+                OrderDataModel m = new OrderDataModel(result);
+                this.tblOrders.setModel(m);
+            } catch (NumberFormatException es) {
+                JOptionPane.showMessageDialog(this, "El dato ingresado no es un numero", "Error al buscar", JOptionPane.WARNING_MESSAGE);
+                txtCampoBusqueda.selectAll();
+            }
+        }
+
+        if (radFindNroCliente.isSelected()) {
+            try {
+                List<Order> result = OrderFacadeSubject.getInstance().cltNmbSearch(new Integer(this.txtCampoBusqueda.getText()));
+                OrderDataModel m = new OrderDataModel(result);
+                this.tblOrders.setModel(m);
+            } catch (NumberFormatException es) {
+                JOptionPane.showMessageDialog(this, "El dato ingresado no es un numero", "Error al buscar", JOptionPane.WARNING_MESSAGE);
+                txtCampoBusqueda.selectAll();
+            }
+        }
+
+        if (radFindState.isSelected()) {
+            List<Order> result = OrderFacadeSubject.getInstance().dispatchCenterSearch((String) cmbDispatcher.getSelectedItem());
+                OrderDataModel m = new OrderDataModel(result);
+                this.tblOrders.setModel(m);
+        }
+
+    }//GEN-LAST:event_btnFindOrderActionPerformed
+
+    private void radCriteriaNroOrdenItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_radCriteriaNroOrdenItemStateChanged
+        if (radCriteriaNroOrden.isSelected()) {
+            OrderFacadeSubject.getInstance().setStrategy(new OrderIdListing(ListingStrategy.DESC));
+            OrderDataModel model;
+            model = new OrderDataModel(OrderFacadeSubject.getInstance().getOrderList());
+        }
+    }//GEN-LAST:event_radCriteriaNroOrdenItemStateChanged
+
+    private void radCriteriaEstadoOrdenItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_radCriteriaEstadoOrdenItemStateChanged
+        if (radCriteriaEstadoOrden.isSelected()) {
+            OrderFacadeSubject.getInstance().setStrategy(new OrderStateListing(ListingStrategy.DESC));
+            OrderDataModel model;
+            model = new OrderDataModel(OrderFacadeSubject.getInstance().getOrderList());
+        }
+    }//GEN-LAST:event_radCriteriaEstadoOrdenItemStateChanged
+
+    private void radCriteriaFechaCreacionItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_radCriteriaFechaCreacionItemStateChanged
+        if(radCriteriaFechaCreacion.isSelected()){
+            OrderFacadeSubject.getInstance().setStrategy(new OrderDateListing(ListingStrategy.DESC));
+            OrderDataModel model;
+            model = new OrderDataModel(OrderFacadeSubject.getInstance().getOrderList());
+        }
+    }//GEN-LAST:event_radCriteriaFechaCreacionItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -390,7 +526,6 @@ public class MainWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAbmItem;
-    private javax.swing.JButton btnCambioEstadoOrden;
     private javax.swing.JButton btnCargarDatos;
     private javax.swing.JButton btnFindOrder;
     private javax.swing.ButtonGroup btnGroupRadFind;
@@ -398,9 +533,8 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JButton btnGuardarDatos;
     private javax.swing.JButton btnNuevaOrden;
     private javax.swing.JButton btnRefresh;
-    private javax.swing.JComboBox cmbStatusOrder;
+    private javax.swing.JComboBox cmbDispatcher;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCampoBusqueda;
@@ -416,6 +550,7 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JRadioButton radCriteriaNroOrden;
     private javax.swing.JRadioButton radFindNroCliente;
     private javax.swing.JRadioButton radFindNroOrden;
+    private javax.swing.JRadioButton radFindState;
     private javax.swing.JTable tblOrders;
     private javax.swing.JTextField txtCampoBusqueda;
     // End of variables declaration//GEN-END:variables
